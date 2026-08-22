@@ -2,7 +2,7 @@
 
 A frontend test project for browsing ships available in World of WarShips.
 
-## Tech stack
+## Tech Stack
 
 - Vue 3
 - TypeScript
@@ -10,7 +10,7 @@ A frontend test project for browsing ships available in World of WarShips.
 - SCSS
 - Vitest
 
-## Code quality
+## Code Quality
 
 - EsLint
 - Prettier
@@ -51,3 +51,8 @@ npm run lint
 ```bash
 npm run format:check
 ```
+
+## Notes
+
+- **CORS & PROXY:** The public API lacks CORS headers for browser requests. A local proxy is configured via Vite (`vite.config.ts`) using the `/api` prefix. The app must be run via `npm run dev` to make network request work.
+- **Code Quality:** ESLint handles logic, TypeScript typing and Prettier manages code formatting.

@@ -6,5 +6,11 @@ export default defineConfig({
   plugins: [vue()],
   server: {
     host: '127.0.0.1',
+    proxy: {
+      '/api/encyclopedia': {
+        target: 'https://vortex.worldofwarships.eu',
+        changeOrigin: true,
+      },
+    },
   },
 })
