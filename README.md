@@ -1,6 +1,6 @@
 # WoWS Explorer
 
-A frontend test project for browsing ships available in World of WarShips.
+A frontend test project for browsing ships available in World of Warships.
 
 ## Tech Stack
 
@@ -8,11 +8,10 @@ A frontend test project for browsing ships available in World of WarShips.
 - TypeScript
 - Vite
 - SCSS
-- Vitest
 
 ## Code Quality
 
-- EsLint
+- ESLint
 - Prettier
 
 ## Requirements
@@ -52,7 +51,7 @@ npm run lint
 npm run format:check
 ```
 
-## Notes
+## Technical Notes
 
-- **CORS & PROXY:** The public API lacks CORS headers for browser requests. A local proxy is configured via Vite (`vite.config.ts`) using the `/api` prefix. The app must be run via `npm run dev` to make network request work.
-- **Code Quality:** ESLint handles logic, TypeScript typing and Prettier manages code formatting.
+- **Native Fetch**: I used the build-in fetch API for all requests to avoid heavy libraries like Axios.
+- **Vite Proxy**: Local requests go through a Vite proxy because the Vortex API doesn't support CORS in the browser/

@@ -18,3 +18,32 @@ export interface Ship {
 }
 
 export type ShipsById = Record<string, Ship>
+
+export interface ShipType {
+  icons: {
+    default: string
+    premium: string
+    special: string
+  }
+  sort_order: number
+  localization: {
+    mark: {
+      en: string
+    }
+  }
+}
+
+export type ShipTypesByName = Record<string, ShipType>
+
+export interface Nation {
+  name: string
+  icons: {
+    small: string
+    large: string
+  }
+  localization: {
+    mark: {
+      en: string
+    }
+  }
+}
