@@ -56,5 +56,10 @@ export interface ShipListItem {
   nationName: string
   typeKey: string | null
   typeName: string | null
-  imageUrl: string
+  imageUrl: string | null
+}
+
+export interface ShipFilterOption {
+  value: string
+  label: string
 }

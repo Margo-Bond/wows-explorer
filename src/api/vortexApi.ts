@@ -3,7 +3,7 @@ import type { ShipsById, ShipTypesByName, Nation } from '../types/ship'
 
 const API_BASE_PATH = '/api/encyclopedia/en'
 
-export async function request<T>(path: string): Promise<T> {
+async function request<T>(path: string): Promise<T> {
   const response = await fetch(`${API_BASE_PATH}${path}`)
 
   if (!response.ok) {

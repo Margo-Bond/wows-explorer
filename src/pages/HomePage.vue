@@ -5,10 +5,15 @@ import { fetchShips, fetchShipTypes, fetchNations, fetchMediaBaseUrl } from '../
 
 import ShipList from '../components/ShipList.vue'
 import ShipFilters from '../components/ShipFilters.vue'
-import EmptyState from '../components/EmptyState.vue'
 import ErrorState from '../components/ErrorState.vue'
 
-import type { ShipsById, ShipTypesByName, ShipListItem, Nation } from '../types/ship.ts'
+import type {
+  ShipsById,
+  ShipTypesByName,
+  ShipListItem,
+  ShipFilterOption,
+  Nation,
+} from '../types/ship'
 
 const ships = ref<ShipsById>({})
 const shipTypes = ref<ShipTypesByName>({})
@@ -16,7 +21,7 @@ const nations = ref<Nation[]>([])
 const mediaBaseUrl = ref('')
 
 const isLoading = ref(false)
-const hasError = ref(false)
+const hasShipsError = ref(false)
 
 const searchQuery = ref('')
 const selectedNation = ref('')
@@ -26,12 +31,12 @@ const selectedTier = ref<number | null>(null)
 const shipList = computed<ShipListItem[]>(() => {
   const nationsByName = new Map(nations.value.map((nation) => [nation.name, nation]))
 
+  const shipTypeEntries = Object.entries(shipTypes.value)
+
   return Object.entries(ships.value).map(([id, ship]) => {
     const nation = nationsByName.get(ship.nation)
 
-    const typeEntry = Object.entries(shipTypes.value).find(([typeKey]) =>
-      ship.tags.includes(typeKey),
-    )
+    const typeEntry = shipTypeEntries.find(([typeKey]) => ship.tags.includes(typeKey))
 
     const [typeKey, type] = typeEntry ?? []
 
@@ -43,13 +48,39 @@ const shipList = computed<ShipListItem[]>(() => {
       nationName: nation?.localization.mark.en ?? ship.nation,
       typeKey: typeKey ?? null,
       typeName: type?.localization.mark.en ?? null,
-      imageUrl: `${mediaBaseUrl.value}${ship.icons.medium}`,
+      imageUrl: mediaBaseUrl.value ? `${mediaBaseUrl.value}${ship.icons.medium}` : null,
     }
   })
 })
 
+const nationOptions = computed<ShipFilterOption[]>(() => {
+  const nationLabels = new Map(
+    nations.value.map((nation) => [nation.name, nation.localization.mark.en]),
+  )
+
+  const nationKeys = [...new Set(Object.values(ships.value).map((ship) => ship.nation))]
+
+  return nationKeys
+    .map((nationKey) => ({
+      value: nationKey,
+      label: nationLabels.get(nationKey) ?? nationKey,
+    }))
+    .sort((first, second) => first.label.localeCompare(second.label))
+})
+
+const shipTypeOptions = computed<ShipFilterOption[]>(() => {
+  return Object.entries(shipTypes.value)
+    .sort(([, first], [, second]) => {
+      return first.sort_order - second.sort_order
+    })
+    .map(([typeKey, type]) => ({
+      value: typeKey,
+      label: type.localization.mark.en,
+    }))
+})
+
 const availableTiers = computed(() => {
-  return [...new Set(shipList.value.map((ship) => ship.tier))].sort(
+  return [...new Set(Object.values(ships.value).map((ship) => ship.level))].sort(
     (first, second) => first - second,
   )
 })
@@ -72,25 +103,35 @@ const filteredShips = computed(() => {
 
 async function loadShipCatalog() {
   isLoading.value = true
-  hasError.value = false
+  hasShipsError.value = false
+
+  const shipsRequest = fetchShips()
+  const mediaRequest = fetchMediaBaseUrl().catch(() => null)
+
+  void loadShipCatalogMetadata()
 
   try {
-    const [shipsData, shipTypesData, nationsData, mediaBaseUrlData] = await Promise.all([
-      fetchShips(),
-      fetchShipTypes(),
-      fetchNations(),
-      fetchMediaBaseUrl(),
-    ])
+    const [shipsData, mediaBaseUrlData] = await Promise.all([shipsRequest, mediaRequest])
 
     ships.value = shipsData
-    shipTypes.value = shipTypesData
-    nations.value = nationsData
-    mediaBaseUrl.value = mediaBaseUrlData
+    mediaBaseUrl.value = mediaBaseUrlData ?? ''
   } catch {
-    hasError.value = true
+    ships.value = {}
+    hasShipsError.value = true
   } finally {
     isLoading.value = false
   }
+}
+
+function loadShipCatalogMetadata() {
+  return Promise.allSettled([
+    fetchNations().then((data) => {
+      nations.value = data
+    }),
+    fetchShipTypes().then((data) => {
+      shipTypes.value = data
+    }),
+  ])
 }
 
 function resetFilters() {
@@ -109,7 +150,7 @@ onMounted(loadShipCatalog)
 
     <p v-if="isLoading">Loading ships...</p>
 
-    <ErrorState v-else-if="hasError" @retry="loadShipCatalog" />
+    <ErrorState v-else-if="hasShipsError" @retry="loadShipCatalog" />
 
     <template v-else>
       <ShipFilters
@@ -117,8 +158,8 @@ onMounted(loadShipCatalog)
         v-model:nation="selectedNation"
         v-model:ship-type="selectedType"
         v-model:tier="selectedTier"
-        :nations="nations"
-        :ship-types="shipTypes"
+        :nation-options="nationOptions"
+        :ship-type-options="shipTypeOptions"
         :tiers="availableTiers"
         @reset="resetFilters"
       />
@@ -128,7 +169,9 @@ onMounted(loadShipCatalog)
           Showing {{ filteredShips.length }} of {{ shipList.length }} ships
         </p>
 
-        <EmptyState v-if="filteredShips.length === 0" @reset="resetFilters" />
+        <div v-if="filteredShips.length === 0" class="empty-state">
+          <p class="empty-text">No ship found. Try changing the filters.</p>
+        </div>
 
         <ShipList v-else :ships="filteredShips" />
       </section>
@@ -147,5 +190,13 @@ onMounted(loadShipCatalog)
 
 .results-count {
   margin: 0 0 16px;
+}
+
+.empty-state {
+  text-align: center;
+}
+
+.empty-text {
+  margin: 8px 0;
 }
 </style>

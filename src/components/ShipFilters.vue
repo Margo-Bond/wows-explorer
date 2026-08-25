@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import type { Nation, ShipTypesByName } from '../types/ship'
+import type { ShipFilterOption } from '../types/ship'
 
-const props = defineProps<{
-  nations: Nation[]
-  shipTypes: ShipTypesByName
+defineProps<{
+  nationOptions: ShipFilterOption[]
+  shipTypeOptions: ShipFilterOption[]
   tiers: number[]
 }>()
 
@@ -18,12 +18,6 @@ const emit = defineEmits<{
   reset: []
 }>()
 
-const sortedShipTypes = computed(() =>
-  Object.entries(props.shipTypes).sort(([, first], [, second]) => {
-    return first.sort_order - second.sort_order
-  }),
-)
-
 const hasActiveFilters = computed(() => {
   return Boolean(search.value.trim() || nation.value || shipType.value || tier.value !== null)
 })
@@ -32,37 +26,41 @@ const hasActiveFilters = computed(() => {
 <template>
   <section class="ship-filters" aria-labelledby="filters-title">
     <h2 id="filters-title" class="filters-title">Filters</h2>
-
-    <label for="filter-field">
+    <label class="filter*field">
       <span>Search</span>
       <input v-model="search" type="search" placeholder="Search by ship name" />
     </label>
 
-    <label for="filter-field">
+    <label class="filter-field">
       <span>Nation</span>
       <select v-model="nation">
         <option value="">All nations</option>
-        <option v-for="nationOption in nations" :key="nationOption.name" :value="nationOption.name">
-          {{ nationOption.localization.mark.en }}
+        <option
+          v-for="nationOption in nationOptions"
+          :key="nationOption.value"
+          :value="nationOption.value"
+        >
+          {{ nationOption.label }}
         </option>
       </select>
     </label>
 
     <label class="filter-field">
       <span>Type</span>
-
-      <select v-model="shipType">
+      <select v-model="shipType" :disabled="shipTypeOptions.length === 0">
         <option value="">All types</option>
-
-        <option v-for="[typeKey, typeData] in sortedShipTypes" :key="typeKey" :value="typeKey">
-          {{ typeData.localization.mark.en }}
+        <option
+          v-for="shipTypeOption in shipTypeOptions"
+          :key="shipTypeOption.value"
+          :value="shipTypeOption.value"
+        >
+          {{ shipTypeOption.label }}
         </option>
       </select>
     </label>
 
     <label class="filter-field">
       <span>Tier</span>
-
       <select v-model="tier">
         <option :value="null">All tiers</option>
         <option v-for="tierOption in tiers" :key="tierOption" :value="tierOption">
@@ -77,8 +75,8 @@ const hasActiveFilters = computed(() => {
   </section>
 </template>
 
-<style setup lang="scss">
-.ship-field {
+<style scoped lang="scss">
+.ship-filters {
   display: grid;
   gap: 16px;
 }
