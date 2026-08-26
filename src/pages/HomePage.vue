@@ -146,57 +146,128 @@ onMounted(loadShipCatalog)
 
 <template>
   <main class="home-page">
-    <h1>WoWS Explorer</h1>
+    <div class="page-container">
+      <header class="page-header">
+        <p class="page-eyebrow">World of Warships</p>
+        <h1 class="page-title">Ship Explorer</h1>
+        <p class="page-description">Explore ships by nation, type and tier.</p>
+      </header>
 
-    <p v-if="isLoading">Loading ships...</p>
+      <p v-if="isLoading" class="loading-state">Loading ships...</p>
 
-    <ErrorState v-else-if="hasShipsError" @retry="loadShipCatalog" />
+      <ErrorState v-else-if="hasShipsError" @retry="loadShipCatalog" />
 
-    <template v-else>
-      <ShipFilters
-        v-model:search="searchQuery"
-        v-model:nation="selectedNation"
-        v-model:ship-type="selectedType"
-        v-model:tier="selectedTier"
-        :nation-options="nationOptions"
-        :ship-type-options="shipTypeOptions"
-        :tiers="availableTiers"
-        @reset="resetFilters"
-      />
+      <template v-else>
+        <ShipFilters
+          v-model:search="searchQuery"
+          v-model:nation="selectedNation"
+          v-model:ship-type="selectedType"
+          v-model:tier="selectedTier"
+          :nation-options="nationOptions"
+          :ship-type-options="shipTypeOptions"
+          :tiers="availableTiers"
+          @reset="resetFilters"
+        />
 
-      <section class="ship-results">
-        <p class="results-count">
-          Showing {{ filteredShips.length }} of {{ shipList.length }} ships
-        </p>
+        <section class="ship-results">
+          <p class="results-count">
+            <strong>{{ filteredShips.length }}</strong> of {{ shipList.length }} ships
+          </p>
 
-        <div v-if="filteredShips.length === 0" class="empty-state">
-          <p class="empty-text">No ship found. Try changing the filters.</p>
-        </div>
+          <p v-if="filteredShips.length === 0" class="empty-state">
+            No ship found. Try changing the filters.
+          </p>
 
-        <ShipList v-else :ships="filteredShips" />
-      </section>
-    </template>
+          <ShipList v-else :ships="filteredShips" />
+        </section>
+      </template>
+    </div>
   </main>
 </template>
 
 <style scoped lang="scss">
 .home-page {
   min-height: 100vh;
+  padding: 56px 24px 80px;
+}
+
+.page-container {
+  width: min(1400px, 100%);
+  margin: 0 auto;
+}
+
+.page-header {
+  max-width: 680px;
+  margin-bottom: 40px;
+}
+
+.page-eyebrow {
+  margin: 0 0 8px;
+  color: var(--color-accent);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.page-title {
+  margin: 0;
+  font-size: clamp(40px, 5vw, 68px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+}
+
+.page-description {
+  margin: 16px 0 0;
+  color: var(--color-text-seconrady);
+  font-size: 17px;
+  line-height: 1.5;
 }
 
 .ship-results {
-  margin-top: 24px;
+  margin-top: 32px;
 }
 
 .results-count {
-  margin: 0 0 16px;
+  margin: 0 0 18px;
+  color: var(--color-text-seconrady);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
+.results-count strong {
+  color: var(--color-text);
+  font-size: 16px;
+}
+
+.loading-state,
 .empty-state {
+  margin: 48px 0;
+  color: var(--color-text-seconrady);
   text-align: center;
 }
 
-.empty-text {
-  margin: 8px 0;
+@media (max-width: 767px) {
+  .home-page {
+    padding: 32px 16px 56px;
+  }
+
+  .page-header {
+    margin-bottom: 28px;
+  }
+
+  .page-title {
+    font-size: clamp(36px, 12vw, 48px);
+  }
+
+  .page-description {
+    font-size: 15px;
+  }
+
+  .ship-result {
+    margin-top: 24px;
+  }
 }
 </style>
