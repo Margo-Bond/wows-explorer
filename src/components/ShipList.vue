@@ -26,7 +26,6 @@ let observer: IntersectionObserver | null = null
 
 function loadMoreShips() {
   if (!hasMoreShips.value) return
-
   visibleCount.value = Math.min(visibleCount.value + RENDER_BATCH_SIZE, props.ships.length)
 }
 
@@ -57,30 +56,62 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <ul class="ship-list">
+  <TransitionGroup name="ship-grid" class="ship-list" tag="ul">
     <ShipCard
       v-for="(ship, index) in visibleShips"
       :key="ship.id"
       :ship="ship"
       :is-priority="index === 0"
     />
+  </TransitionGroup>
 
-    <li ref="loadMoreTarget" class="load-more-target" aria-hidden="true" />
-  </ul>
+  <div v-if="hasMoreShips" ref="loadMoreTarget" class="load-more-target" aria-hidden="true"></div>
 </template>
 
 <style scoped lang="scss">
 .ship-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .load-more-target {
-  grid-column: 1 / -1;
   height: 1px;
+}
+
+.ship-grid-enter-active,
+.ship-grid-leave-active {
+  transition:
+    opacity 280ms ease,
+    transform 280ms cubic-bezier((0.25, 0.46, 0.45, 0.94));
+}
+
+.ship-grid-enter-from {
+  opacity: 0;
+  transform: translateY(14px);
+}
+
+.ship-grid-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+.ship-grid-move {
+  transition: transform 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@media (max-width: 1100px) {
+  .ship-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .ship-list {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

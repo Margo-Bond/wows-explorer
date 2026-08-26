@@ -51,7 +51,7 @@ export interface Nation {
 export interface ShipListItem {
   id: string
   name: string
-  tier: number
+  level: number
   nationKey: string
   nationName: string
   typeKey: string | null

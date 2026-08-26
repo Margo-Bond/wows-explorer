@@ -6,6 +6,7 @@ import { fetchShips, fetchShipTypes, fetchNations, fetchMediaBaseUrl } from '../
 import ShipList from '../components/ShipList.vue'
 import ShipFilters from '../components/ShipFilters.vue'
 import ErrorState from '../components/ErrorState.vue'
+import ShipListSkeleton from '../components/ShipListSkeleton.vue'
 
 import type {
   ShipsById,
@@ -43,7 +44,7 @@ const shipList = computed<ShipListItem[]>(() => {
     return {
       id,
       name: ship.localization.mark.en,
-      tier: ship.level,
+      level: ship.level,
       nationKey: ship.nation,
       nationName: nation?.localization.mark.en ?? ship.nation,
       typeKey: typeKey ?? null,
@@ -95,7 +96,7 @@ const filteredShips = computed(() => {
 
     const matchesType = !selectedType.value || ship.typeKey === selectedType.value
 
-    const matchesTier = selectedTier.value === null || ship.tier === selectedTier.value
+    const matchesTier = selectedTier.value === null || ship.level === selectedTier.value
 
     return matchesSearch && matchesNation && matchesType && matchesTier
   })
@@ -114,6 +115,16 @@ async function loadShipCatalog() {
     const [shipsData, mediaBaseUrlData] = await Promise.all([shipsRequest, mediaRequest])
 
     ships.value = shipsData
+    console.log(
+      Object.entries(shipsData)
+        .filter(([, ship]) => ship.localization.mark.en.includes('['))
+        .map(([id, ship]) => ({
+          id,
+          name: ship.localization.mark.en,
+          internalName: ship.name,
+          tags: ship.tags.join(', '),
+        })),
+    )
     mediaBaseUrl.value = mediaBaseUrlData ?? ''
   } catch {
     ships.value = {}
@@ -153,7 +164,7 @@ onMounted(loadShipCatalog)
         <p class="page-description">Explore ships by nation, type and tier.</p>
       </header>
 
-      <p v-if="isLoading" class="loading-state">Loading ships...</p>
+      <ShipListSkeleton v-if="isLoading" />
 
       <ErrorState v-else-if="hasShipsError" @retry="loadShipCatalog" />
 
@@ -202,26 +213,27 @@ onMounted(loadShipCatalog)
 }
 
 .page-eyebrow {
-  margin: 0 0 8px;
+  margin: 0 0 10px;
   color: var(--color-accent);
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.32em;
   text-transform: uppercase;
 }
 
 .page-title {
   margin: 0;
-  font-size: clamp(40px, 5vw, 68px);
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  font-size: clamp(40px, 6vw, 76px);
+  font-weight: 900;
+  line-height: 0.92;
+  letter-spacing: -0.045em;
   text-transform: uppercase;
 }
 
 .page-description {
   margin: 16px 0 0;
   color: var(--color-text-seconrady);
-  font-size: 17px;
+  font-size: 16px;
   line-height: 1.5;
 }
 
@@ -232,14 +244,14 @@ onMounted(loadShipCatalog)
 .results-count {
   margin: 0 0 18px;
   color: var(--color-text-seconrady);
-  font-size: 14px;
+  font-family: var(--font-mono);
+  font-size: 12px;
   letter-spacing: 0.04em;
-  text-transform: uppercase;
 }
 
 .results-count strong {
   color: var(--color-text);
-  font-size: 16px;
+  font-weight: 500;
 }
 
 .loading-state,
