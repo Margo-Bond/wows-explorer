@@ -10,3 +10,9 @@ defineEmits<{
     <button type="button" @click="$emit('retry')">Try again</button>
   </div>
 </template>
+
+<style scoped lang="scss">
+.error-state {
+  text-align: center;
+}
+</style>

@@ -96,7 +96,7 @@ function selectShipType(value: string) {
             :key="shipTypeOption.value"
             type="button"
             class="type-option"
-            :class="{ 'type-option*active': shipType === shipTypeOption.value }"
+            :class="{ 'type-option-active': shipType === shipTypeOption.value }"
             @click="selectShipType(shipTypeOption.value)"
           >
             {{ shipTypeOption.label }}
@@ -113,7 +113,7 @@ function selectShipType(value: string) {
   top: 0;
   z-index: 10;
   padding: 16px;
-  background: rgba(4, 13, 28, 0.95);
+  background-color: rgba(4, 13, 28, 0.95);
   border-bottom: 1px solid var(--color-border);
   backdrop-filter: blur(10px);
 }
@@ -145,6 +145,21 @@ function selectShipType(value: string) {
   gap: 6px;
 }
 
+.ship-filters,
+.filter-grid,
+.filter-field {
+  min-width: 0;
+}
+
+.filter-search {
+  width: 100%;
+}
+
+.filter-search .filter-control {
+  width: 100%;
+  min-width: 0;
+}
+
 .filter-label {
   color: var(--color-text-secondary);
   font-family: var(--font-mono);
@@ -160,7 +175,7 @@ function selectShipType(value: string) {
   height: 42px;
   padding: 0 10px;
   color: var(--color-text);
-  background: var(--color-surface);
+  background-color: var(--color-surface);
   border: 1px solid rgba(0, 180, 216, 0.2);
   border-radius: 0;
   outline: none;
@@ -179,7 +194,7 @@ function selectShipType(value: string) {
 }
 
 .filter-control:focus {
-  background: #081a30;
+  background-color: #081a30;
   border-color: var(--color-accent);
   box-shadow: 0 0 0 1px rgba(0, 180, 216, 0.2);
 }
@@ -225,7 +240,7 @@ function selectShipType(value: string) {
 
 .type-option-active {
   color: var(--color-accent);
-  background: rgba(0, 180, 216, 0.1);
+  background-color: rgba(0, 180, 216, 0.1);
   border-color: rgba(0, 180, 216, 0.45);
 }
 
@@ -254,10 +269,6 @@ function selectShipType(value: string) {
   .filters-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-
-  .filter-search {
-    grid-column: 1 / -1;
-  }
 }
 
 @media (max-width: 600px) {
@@ -268,11 +279,11 @@ function selectShipType(value: string) {
   }
 
   .filters-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .filter-search {
-    grid-column: auto;
+    grid-column: 1/4;
   }
 }
 </style>

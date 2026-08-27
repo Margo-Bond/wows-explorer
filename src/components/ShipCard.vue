@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import type { ShipListItem } from '../types/ship'
+
+const imageFailed = ref(false)
 
 withDefaults(
   defineProps<{
@@ -10,22 +13,29 @@ withDefaults(
     isPriority: false,
   },
 )
+
+function handleImageError() {
+  imageFailed.value = true
+}
 </script>
 
 <template>
   <li class="ship-card">
     <div class="ship-image-wrapper">
       <img
-        v-if="ship.imageUrl"
+        v-if="ship.imageUrl && !imageFailed"
         class="ship-image"
         :src="ship.imageUrl"
         :alt="ship.name"
         :loading="isPriority ? 'eager' : 'lazy'"
         :fetchpriority="isPriority ? 'high' : 'auto'"
         decoding="async"
+        @error="handleImageError"
       />
 
-      <div v-else class="ship-image-placeholder" aria-hidden="true"></div>
+      <div v-else class="ship-image-placeholder" aria-hidden="true">
+        <span>Image unavailable</span>
+      </div>
     </div>
 
     <div class="ship-content">
@@ -50,7 +60,7 @@ withDefaults(
   min-height: 176px;
   overflow: hidden;
   list-style: none;
-  background: var(--color-surface);
+  background-color: var(--color-surface);
   border: 1px solid rgba(0, 180, 216, 0.15);
   transition:
     transform 220ms ease,
@@ -64,7 +74,7 @@ withDefaults(
   bottom: 0;
   left: 0;
   height: 1px;
-  background: var(--color-accent);
+  background-color: var(--color-accent);
   content: '';
   opacity: 0;
   transform: scaleX(0);
@@ -91,7 +101,7 @@ withDefaults(
   height: 100%;
   overflow: hidden;
   aspect-ratio: auto;
-  background-color: #0a1e3a;
+  background-color: var(--color-image-background);
 }
 
 .ship-image-wrapper::after {
@@ -125,7 +135,14 @@ withDefaults(
 }
 
 .ship-image-placeholder {
-  background-color: #0a1e3a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-image-background);
+  color: rgba(138, 180, 208, 0.45);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .ship-content {

@@ -28,7 +28,7 @@ const SKELETON_COUNT = 9
   grid-template-columns: 42% minmax(0, 1fr);
   min-height: 176px;
   overflow: hidden;
-  background: var(--color-surface);
+  background-color: var(--color-surface);
   border: 1px solid rgba(0, 180, 216, 0.1);
 }
 
@@ -56,7 +56,7 @@ const SKELETON_COUNT = 9
 .skeleton-meta {
   position: relative;
   overflow: hidden;
-  background: #0d2040;
+  background-color: #0d2040;
 }
 
 .skeleton-image::after,

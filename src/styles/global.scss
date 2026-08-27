@@ -6,6 +6,7 @@
   --color-background-deep: #020813;
   --color-surface: #07152a;
   --color-surface-dark: #04101f;
+  --color-image-background: #0a1e3a;
 
   --color-text: #f4f7fa;
   --color-text-secondary: #8ab4d0;
@@ -64,4 +65,24 @@ button:disabled {
 
 #app {
   min-height: 100vh;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ship-card,
+  .ship-image,
+  .type-option,
+  .filter-control,
+  .reset-button,
+  .ship-grid-enter-active,
+  .ship-grid-leave-active,
+  .ship-grid-move {
+    transition: none;
+  }
+
+  .skeleton-image::after,
+  .skeleton-label::after,
+  .skeleton-title::after,
+  .skeleton-meta::after {
+    animation: none;
+  }
 }

@@ -115,16 +115,7 @@ async function loadShipCatalog() {
     const [shipsData, mediaBaseUrlData] = await Promise.all([shipsRequest, mediaRequest])
 
     ships.value = shipsData
-    console.log(
-      Object.entries(shipsData)
-        .filter(([, ship]) => ship.localization.mark.en.includes('['))
-        .map(([id, ship]) => ({
-          id,
-          name: ship.localization.mark.en,
-          internalName: ship.name,
-          tags: ship.tags.join(', '),
-        })),
-    )
+
     mediaBaseUrl.value = mediaBaseUrlData ?? ''
   } catch {
     ships.value = {}
