@@ -86,7 +86,7 @@ onBeforeUnmount(() => {
 .ship-grid-leave-active {
   transition:
     opacity 280ms ease,
-    transform 280ms cubic-bezier((0.25, 0.46, 0.45, 0.94));
+    transform 280ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .ship-grid-enter-from {

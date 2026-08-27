@@ -223,7 +223,7 @@ onMounted(loadShipCatalog)
 
 .page-description {
   margin: 16px 0 0;
-  color: var(--color-text-seconrady);
+  color: var(--color-text-secondary);
   font-size: 16px;
   line-height: 1.5;
 }
@@ -234,7 +234,7 @@ onMounted(loadShipCatalog)
 
 .results-count {
   margin: 0 0 18px;
-  color: var(--color-text-seconrady);
+  color: var(--color-text-secondary);
   font-family: var(--font-mono);
   font-size: 12px;
   letter-spacing: 0.04em;
@@ -248,7 +248,7 @@ onMounted(loadShipCatalog)
 .loading-state,
 .empty-state {
   margin: 48px 0;
-  color: var(--color-text-seconrady);
+  color: var(--color-text-secondary);
   text-align: center;
 }
 
@@ -269,7 +269,7 @@ onMounted(loadShipCatalog)
     font-size: 15px;
   }
 
-  .ship-result {
+  .ship-results {
     margin-top: 24px;
   }
 }

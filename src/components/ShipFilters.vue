@@ -146,7 +146,7 @@ function selectShipType(value: string) {
 }
 
 .ship-filters,
-.filter-grid,
+.filters-grid,
 .filter-field {
   min-width: 0;
 }

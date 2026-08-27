@@ -13,6 +13,8 @@ A frontend test project for browsing ships available in World of Warships.
 
 - ESLint
 - Prettier
+- Vitest
+- Vue Test Utils
 
 ## Features
 
@@ -24,6 +26,7 @@ A frontend test project for browsing ships available in World of Warships.
 - Loading and error states
 - Retry action for failed API requests
 - Lazy loading for ship images
+- Fallback state for unavailable ship images, animated loading skeleton
 
 ## Requirements
 
@@ -62,11 +65,19 @@ npm run lint
 npm run format:check
 ```
 
+- Run tests:
+
+```bash
+npm test
+```
+
 ## Technical Notes
 
-- **Native fetch**: I used the build-in fetch API for all requests to avoid heavy libraries like Axios.
-- **Vite froxy**: Local requests go through a Vite proxy because the Vortex API doesn't support CORS in the browser.
+- **Native fetch**: I used the built-in Fetch API for all requests to avoid adding a separate HTTP library such as Axios.
+- **Vite froxy**: Local requests go through a Vite development proxy because the Vortex API doesn't allow derict browser requests through CORS.
 - **Data-driven filters**: Filter options are based on API data instead of hardcoded ship nations, types, ot tier.
 - **Progressive data loading**: The ship catalog and media path are loaded independently from auxiliary nation and ship type metadata, so optional metadata failures don't block the main catalog.
-- **Incremental rendering**: the full ship dataset remains available for search and filtering, while only an initial batch of ship cards is rendered. Additional cards are rendered as the user scrolls using <IntersectionObserver>
-- **API payload**: The provided vehicles endpoints returns the complete catalog in a single large response. In a production API, server-side pagination, field selection, and response compression would help reduce the initial network payload.
+- **Incremental rendering**: the full ship dataset remains available for correct search and filtering, while only an initial batch of ship cards is rendered. Additional cards are rendered as the user scrolls using <IntersectionObserver>
+- **Incremental rendering vs virtualization**: I chose incremental rendering instead of full virtual scrolling to keep the implementation simple and dependency-free while still reducing the initial DOM cost. Full virtualization could keep the DOM size constant during very long scrolling, but it would add extra complexity for a responsive grid with different column counts across breakpoints.
+- **API payload**: The provided vehicles endpoint returns the complete catalog in a single large response. In a production API, server-side pagination, field selection, and response compression would help reduce the initial network payload.
+- **Tests**: Component and integration tests cover filter interactions and API error/retry behavior.
