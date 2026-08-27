@@ -7,6 +7,7 @@ defineProps<{
   nationOptions: ShipFilterOption[]
   shipTypeOptions: ShipFilterOption[]
   tiers: number[]
+  hasShipTypesError: boolean
 }>()
 
 const search = defineModel<string>('search', { required: true })
@@ -81,7 +82,12 @@ function selectShipType(value: string) {
 
       <div class="type-filter">
         <span class="filter-label">Ship type</span>
-        <div class="type-options">
+
+        <p v-if="hasShipTypesError" class="type-filter-error" role="status">
+          Type filter unavailable
+        </p>
+
+        <div v-else class="type-options">
           <button
             type="button"
             class="type-option"
@@ -242,6 +248,12 @@ function selectShipType(value: string) {
   color: var(--color-accent);
   background-color: rgba(0, 180, 216, 0.1);
   border-color: rgba(0, 180, 216, 0.45);
+}
+
+.type-filter-error {
+  color: var(--color-text);
+  font-size: 12px;
+  letter-spacing: 0.04em;
 }
 
 .reset-button {

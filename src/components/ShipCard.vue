@@ -41,11 +41,8 @@ function handleImageError() {
     <div class="ship-content">
       <h2 class="ship-title">{{ ship.name }}</h2>
       <div class="ship-details">
-        <div>
-          <span>{{ ship.nationName }}</span>
-          <span v-if="ship.typeName">{{ ship.typeName }}</span>
-        </div>
-
+        <span v-if="ship.typeName" class="ship-type">{{ ship.typeName }}</span>
+        <span>{{ ship.nationName }}</span>
         <span class="ship-tier">Tier {{ ship.level }}</span>
       </div>
     </div>
@@ -150,7 +147,7 @@ function handleImageError() {
   flex-direction: column;
   justify-content: center;
   min-width: 0;
-  padding: 20px;
+  padding: 20px 10px;
   gap: 10px;
 }
 
@@ -175,18 +172,17 @@ function handleImageError() {
   font-size: 14px;
 }
 
-.ship-details span + span::before {
-  margin-right: 12px;
-  color: rgba(138, 180, 208, 0.35);
-  content: '';
+.ship-type {
+  width: fit-content;
+  border: 1px solid var(--color-text-secondary);
+  padding: 4px 6px;
 }
 
 .ship-tier {
-  flex-shrink: 0;
   color: var(--color-accent);
   font-family: var(--font-mono);
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }

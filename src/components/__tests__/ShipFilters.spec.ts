@@ -31,6 +31,7 @@ const defaultProps = {
   ],
 
   tiers: [1, 2, 3],
+  hasShipTypesError: false,
 }
 
 describe('ShipFilters', () => {

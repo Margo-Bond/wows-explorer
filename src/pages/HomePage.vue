@@ -23,20 +23,36 @@ const mediaBaseUrl = ref('')
 
 const isLoading = ref(false)
 const hasShipsError = ref(false)
+const hasShipTypesError = ref(false)
 
 const searchQuery = ref('')
 const selectedNation = ref('')
-const selectedType = ref('')
+const selectedShipType = ref('')
 const selectedTier = ref<number | null>(null)
+
+function formatNationKey(value: string) {
+  const acronyms: Record<string, string> = {
+    usa: 'USA',
+    ussr: 'USSR',
+    uk: 'UK',
+    pan_asia: 'Pan Asia',
+    pan_america: 'Pan America',
+  }
+
+  const normalizedValue = value.toLowerCase()
+
+  return (
+    acronyms[normalizedValue] ??
+    normalizedValue.replaceAll('_', ' ').replace(/\b\w/g, (character) => character.toUpperCase())
+  )
+}
 
 const shipList = computed<ShipListItem[]>(() => {
   const nationsByName = new Map(nations.value.map((nation) => [nation.name, nation]))
-
   const shipTypeEntries = Object.entries(shipTypes.value)
 
   return Object.entries(ships.value).map(([id, ship]) => {
     const nation = nationsByName.get(ship.nation)
-
     const typeEntry = shipTypeEntries.find(([typeKey]) => ship.tags.includes(typeKey))
 
     const [typeKey, type] = typeEntry ?? []
@@ -46,7 +62,7 @@ const shipList = computed<ShipListItem[]>(() => {
       name: ship.localization.mark.en,
       level: ship.level,
       nationKey: ship.nation,
-      nationName: nation?.localization.mark.en ?? ship.nation,
+      nationName: nation?.localization.mark.en ?? formatNationKey(ship.nation),
       typeKey: typeKey ?? null,
       typeName: type?.localization.mark.en ?? null,
       imageUrl: mediaBaseUrl.value ? `${mediaBaseUrl.value}${ship.icons.medium}` : null,
@@ -64,7 +80,7 @@ const nationOptions = computed<ShipFilterOption[]>(() => {
   return nationKeys
     .map((nationKey) => ({
       value: nationKey,
-      label: nationLabels.get(nationKey) ?? nationKey,
+      label: nationLabels.get(nationKey) ?? formatNationKey(nationKey),
     }))
     .sort((first, second) => first.label.localeCompare(second.label))
 })
@@ -91,11 +107,8 @@ const filteredShips = computed(() => {
 
   return shipList.value.filter((ship) => {
     const matchesSearch = !normalizedQuery || ship.name.toLowerCase().includes(normalizedQuery)
-
     const matchesNation = !selectedNation.value || ship.nationKey === selectedNation.value
-
-    const matchesType = !selectedType.value || ship.typeKey === selectedType.value
-
+    const matchesType = !selectedShipType.value || ship.typeKey === selectedShipType.value
     const matchesTier = selectedTier.value === null || ship.level === selectedTier.value
 
     return matchesSearch && matchesNation && matchesType && matchesTier
@@ -105,6 +118,7 @@ const filteredShips = computed(() => {
 async function loadShipCatalog() {
   isLoading.value = true
   hasShipsError.value = false
+  hasShipTypesError.value = false
 
   const shipsRequest = fetchShips()
   const mediaRequest = fetchMediaBaseUrl().catch(() => null)
@@ -125,8 +139,8 @@ async function loadShipCatalog() {
   }
 }
 
-function loadShipCatalogMetadata() {
-  return Promise.allSettled([
+async function loadShipCatalogMetadata() {
+  const [, shipTypesResult] = await Promise.allSettled([
     fetchNations().then((data) => {
       nations.value = data
     }),
@@ -134,12 +148,18 @@ function loadShipCatalogMetadata() {
       shipTypes.value = data
     }),
   ])
+
+  if (shipTypesResult.status === 'rejected') {
+    shipTypes.value = {}
+    selectedShipType.value = ''
+    hasShipTypesError.value = true
+  }
 }
 
 function resetFilters() {
   searchQuery.value = ''
   selectedNation.value = ''
-  selectedType.value = ''
+  selectedShipType.value = ''
   selectedTier.value = null
 }
 
@@ -163,11 +183,12 @@ onMounted(loadShipCatalog)
         <ShipFilters
           v-model:search="searchQuery"
           v-model:nation="selectedNation"
-          v-model:ship-type="selectedType"
+          v-model:ship-type="selectedShipType"
           v-model:tier="selectedTier"
           :nation-options="nationOptions"
           :ship-type-options="shipTypeOptions"
           :tiers="availableTiers"
+          :has-ship-types-error="hasShipTypesError"
           @reset="resetFilters"
         />
 
