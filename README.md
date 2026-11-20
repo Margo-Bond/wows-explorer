@@ -1,6 +1,6 @@
 # WoWS Explorer
 
-A frontend test project for browsing ships available in World of Warships.
+A frontend pet project for browsing ships available in World of Warships.
 
 ## Tech Stack
 
